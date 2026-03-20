@@ -1,0 +1,87 @@
+import { anonymizedDesigns, pseudonymizedDesigns, syntheticDesigns } from '../data';
+import type { PanelType } from '../types';
+
+interface ProcessingDesignCardListProps {
+  type: PanelType;
+}
+
+const themeMap = {
+  anonymized: {
+    title: '加工設計（委員会規則1-5号を意識した例）',
+    cardBorder: 'border-blue-200',
+    cardHeaderBg: 'bg-blue-50 text-blue-800',
+    tableHeaderBg: 'bg-blue-50/60',
+  },
+  pseudonymized: {
+    title: '加工設計（委員会規則1-3号を意識した例）',
+    cardBorder: 'border-orange-200',
+    cardHeaderBg: 'bg-orange-50 text-orange-800',
+    tableHeaderBg: 'bg-orange-50/60',
+  },
+  synthetic: {
+    title: '生成設計（統計モデルに基づく合成データ生成）',
+    cardBorder: 'border-emerald-200',
+    cardHeaderBg: 'bg-emerald-50 text-emerald-800',
+    tableHeaderBg: 'bg-emerald-50/60',
+  },
+} as const;
+
+const designsMap = {
+  anonymized: anonymizedDesigns,
+  pseudonymized: pseudonymizedDesigns,
+  synthetic: syntheticDesigns,
+};
+
+export default function ProcessingDesignCardList({ type }: ProcessingDesignCardListProps) {
+  const theme = themeMap[type];
+  const designs = designsMap[type];
+
+  return (
+    <div>
+      <h4 className="text-sm font-semibold text-gray-700 mb-3">{theme.title}</h4>
+
+      <div className="grid gap-3">
+        {designs.map((design, i) => (
+          <div key={i} className={`border rounded-lg shadow-sm overflow-hidden ${theme.cardBorder}`}>
+            <div className={`px-4 py-2 ${theme.cardHeaderBg}`}>
+              <div className="font-semibold text-sm">{design.category}</div>
+              {design.legalBasis.length > 0 && (
+                <div className="mt-1 space-y-0.5">
+                  {design.legalBasis.map((basis, k) => (
+                    <div key={k} className="text-[11px] opacity-80">
+                      {basis}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className={theme.tableHeaderBg}>
+                    <th className="px-3 py-1.5 text-left font-medium border-b w-1/5">項目</th>
+                    <th className="px-3 py-1.5 text-left font-medium border-b w-2/5">加工内容</th>
+                    <th className="px-3 py-1.5 text-left font-medium border-b w-2/5">意図</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {design.items.map((item, j) => (
+                    <tr key={j} className="hover:bg-gray-50">
+                      <td className="px-3 py-1.5 border-b font-medium">{item.field}</td>
+                      <td className="px-3 py-1.5 border-b">{item.method}</td>
+                      <td className="px-3 py-1.5 border-b text-gray-600">{item.intent}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-3 text-xs text-gray-500 leading-relaxed">
+        ※ 法令の厳密な要件判定を行うものではなく、比較理解のための画面デモです
+      </p>
+    </div>
+  );
+}
