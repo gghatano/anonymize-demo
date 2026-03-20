@@ -6,9 +6,9 @@ interface ModeSwitcherProps {
 }
 
 const pairModes: { value: ViewMode; label: string }[] = [
-  { value: 'anon-pseudo', label: '匿名 × 仮名' },
-  { value: 'anon-synthetic', label: '匿名 × 合成' },
-  { value: 'pseudo-synthetic', label: '仮名 × 合成' },
+  { value: 'anon-pseudo', label: '匿名加工 vs 仮名加工' },
+  { value: 'anon-synthetic', label: '匿名加工 vs 合成データ' },
+  { value: 'pseudo-synthetic', label: '仮名加工 vs 合成データ' },
 ];
 
 const singleModes: { value: ViewMode; label: string }[] = [
@@ -40,15 +40,15 @@ export default function ModeSwitcher({ viewMode, onChange }: ModeSwitcherProps) 
   };
 
   return (
-    <div className="space-y-3">
+    <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm space-y-3">
       <div className="flex items-center gap-3">
-        <span className="text-xs font-semibold text-gray-500 shrink-0">横並び比較</span>
+        <span className="text-xs font-semibold text-gray-500 shrink-0">2方式を比較</span>
         <div className="flex flex-wrap gap-2">
           {pairModes.map(renderButton)}
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-xs font-semibold text-gray-500 shrink-0">単独表示</span>
+        <span className="text-xs font-semibold text-gray-500 shrink-0">1方式を詳しく見る</span>
         <div className="flex flex-wrap gap-2">
           {singleModes.map(renderButton)}
         </div>

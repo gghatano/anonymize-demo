@@ -68,10 +68,10 @@ function StepWrapper({
   return (
     <div className={`rounded-xl border-2 ${t.border} bg-white shadow-sm p-6`}>
       <div className="flex items-center gap-2 mb-3">
-        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold text-white ${t.badgeBg}`}>
+        <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white ${t.badgeBg}`}>
           {stepNum}
         </span>
-        <h3 className="text-sm font-semibold text-gray-800">{stepTitle}</h3>
+        <h3 className="text-base font-semibold text-gray-800">{stepTitle}</h3>
       </div>
       {stepNum === 5
         ? <UsageRuleCard type={type} />
@@ -106,7 +106,7 @@ export default function DemoPage() {
           <h1 className="text-2xl font-bold text-gray-900">
             匿名加工情報・仮名加工情報・合成データの比較デモ
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-base text-gray-600">
             同一の元データに対して、3つの方式で何が異なるかを比較するデモ
           </p>
         </div>
@@ -118,13 +118,21 @@ export default function DemoPage() {
         </div>
       </div>
 
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-gray-600">
+          <span className="font-semibold">使い方：</span>
+          比較モードを選択し、ステップ1〜5を順に確認することで、各方式の違いが理解できます。
+          ステップ3では「加工結果を表示」ボタンを押すと、加工後のデータが表示されます。
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <ModeSwitcher viewMode={viewMode} onChange={setViewMode} />
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         {isPair ? (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <PanelHeader type={pair[0]} />
               <PanelHeader type={pair[1]} />
@@ -155,6 +163,12 @@ export default function DemoPage() {
           right={pair ? pair[1] : viewMode as PanelType}
         />
       </section>
+
+      <footer className="border-t border-gray-200 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-xs text-gray-400">
+          本デモは教育・比較理解を目的としたものです。実際の法令適合性判定を行うものではありません。
+        </div>
+      </footer>
     </div>
   );
 }
