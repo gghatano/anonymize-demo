@@ -7,7 +7,7 @@ import type { AnalysisResult } from '../types';
 export const anonymizedAnalysis: AnalysisResult[] = [
   {
     title: '年齢分布（分析イメージ）',
-    subtitle: '10歳刻みの年齢帯で集計 ─ 5カテゴリに集約',
+    subtitle: '10歳刻みの粗い集計のみ可能',
     type: 'bar',
     data: [
       { name: '20代', value: 420 },
@@ -19,7 +19,7 @@ export const anonymizedAnalysis: AnalysisResult[] = [
   },
   {
     title: '地域別人数（分析イメージ）',
-    subtitle: '都道府県単位で集計 ─ 上位のみ表示',
+    subtitle: '都道府県単位の集計にとどまる',
     type: 'bar',
     data: [
       { name: '東京都', value: 850 },
@@ -32,7 +32,7 @@ export const anonymizedAnalysis: AnalysisResult[] = [
   },
   {
     title: '購買金額分布（分析イメージ）',
-    subtitle: '大きな金額帯で集計（トップコード化あり）',
+    subtitle: '大きな金額帯でしか傾向を把握できない',
     type: 'bar',
     data: [
       { name: '1万未満', value: 680 },
@@ -43,7 +43,7 @@ export const anonymizedAnalysis: AnalysisResult[] = [
   },
   {
     title: '疾患区分別件数（分析イメージ）',
-    subtitle: '大分類に統合して集計 ─ 5カテゴリ',
+    subtitle: '大分類での集計のみ ─ 個別疾患の傾向は不明',
     type: 'bar',
     data: [
       { name: '循環器系', value: 620 },
@@ -59,7 +59,7 @@ export const anonymizedAnalysis: AnalysisResult[] = [
 export const syntheticAnalysis: AnalysisResult[] = [
   {
     title: '年齢分布（分析イメージ）',
-    subtitle: '1歳刻みで集計 ─ 元データの分布を再現しつつ、なめらかな分布',
+    subtitle: '1歳刻みの詳細な分析が可能 ─ 元データの分布をなめらかに再現',
     type: 'bar',
     data: [
       // 仮名加工の2つの山と似た形だが、よりなめらか
@@ -82,7 +82,7 @@ export const syntheticAnalysis: AnalysisResult[] = [
   },
   {
     title: '地域別人数（分析イメージ）',
-    subtitle: '市区町村単位で集計 ─ 元データの地域偏りを再現',
+    subtitle: '市区町村単位で集計可能 ─ 元データの地域偏りを再現',
     type: 'bar',
     data: [
       { name: '港区', value: 265 },
@@ -104,7 +104,7 @@ export const syntheticAnalysis: AnalysisResult[] = [
   },
   {
     title: '購買金額分布（分析イメージ）',
-    subtitle: '1万円刻みで集計 ─ 二極化の傾向を再現',
+    subtitle: '1万円刻みで集計可能 ─ 二極化の傾向を再現',
     type: 'bar',
     data: [
       { name: '~1万', value: 435 },
@@ -132,7 +132,7 @@ export const syntheticAnalysis: AnalysisResult[] = [
   },
   {
     title: '疾患区分別件数（分析イメージ）',
-    subtitle: '詳細な病名で集計 ─ 元データの疾患構成を再現',
+    subtitle: '詳細な病名で集計可能 ─ 元データの疾患構成を再現',
     type: 'bar',
     data: [
       { name: '花粉症', value: 408 },
@@ -156,7 +156,7 @@ export const syntheticAnalysis: AnalysisResult[] = [
 export const pseudonymizedAnalysis: AnalysisResult[] = [
   {
     title: '年齢分布（分析イメージ）',
-    subtitle: '1歳刻みで集計 ─ 匿名加工では見えなかった2つの山が出現',
+    subtitle: '1歳刻みの詳細な分析が可能 ─ 2つの年齢ピークが判明',
     type: 'bar',
     data: [
       // 20代前半：谷
@@ -182,7 +182,7 @@ export const pseudonymizedAnalysis: AnalysisResult[] = [
   },
   {
     title: '地域別人数（分析イメージ）',
-    subtitle: '市区町村単位で集計 ─ 都道府県では見えなかった偏りが判明',
+    subtitle: '市区町村単位で集計可能 ─ 都道府県では見えなかった偏りが判明',
     type: 'bar',
     data: [
       // 東京都内が分解される → 港区に集中していることが判明
@@ -209,7 +209,7 @@ export const pseudonymizedAnalysis: AnalysisResult[] = [
   },
   {
     title: '購買金額分布（分析イメージ）',
-    subtitle: '1万円刻みで集計 ─ 匿名加工では見えなかった二極化が出現',
+    subtitle: '1万円刻みで集計可能 ─ 低価格帯と高価格帯の二極化が判明',
     type: 'bar',
     data: [
       // 低価格帯の山
@@ -240,7 +240,7 @@ export const pseudonymizedAnalysis: AnalysisResult[] = [
   },
   {
     title: '疾患区分別件数（分析イメージ）',
-    subtitle: '詳細な病名で集計 ─ 大分類内の内訳が判明',
+    subtitle: '詳細な病名で集計可能 ─ 大分類内の内訳が判明',
     type: 'bar',
     data: [
       // アレルギー系の内訳（匿名加工では「830」の1本だった）
