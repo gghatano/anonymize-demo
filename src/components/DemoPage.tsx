@@ -117,18 +117,29 @@ export default function DemoPage() {
               同一の元データに対して、3つの方式で何が異なるかを比較するデモ
             </p>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-sm text-gray-500">プレゼン</span>
-            <button
-              onClick={() => setIsPresentation(!isPresentation)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                isPresentation ? 'bg-indigo-600' : 'bg-gray-300'
-              }`}
+          <div className="flex items-center gap-4 shrink-0">
+            <a
+              href="https://github.com/gghatano/anonymize-demo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+              title="GitHub リポジトリ"
             >
-              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                isPresentation ? 'translate-x-6' : 'translate-x-1'
-              }`} />
-            </button>
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </a>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500">プレゼン</span>
+              <button
+                onClick={() => setIsPresentation(!isPresentation)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                  isPresentation ? 'bg-indigo-600' : 'bg-gray-300'
+                }`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  isPresentation ? 'translate-x-6' : 'translate-x-1'
+                }`} />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -149,17 +160,24 @@ export default function DemoPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <ModeSwitcher viewMode={viewMode} onChange={setViewMode} />
+      {/* ── Sticky: モード切替 + パネルヘッダー ── */}
+      <div className="sticky top-0 z-20 bg-gray-50 pb-4 pt-4 border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ModeSwitcher viewMode={viewMode} onChange={setViewMode} />
+        </div>
+        {isPair && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PanelHeader type={pair[0]} />
+              <PanelHeader type={pair[1]} />
+            </div>
+          </div>
+        )}
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         {isPair ? (
           <div className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <PanelHeader type={pair[0]} />
-              <PanelHeader type={pair[1]} />
-            </div>
             {visibleSteps.map((step) => (
               <div key={step.num} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
                 <StepWrapper stepNum={step.num} stepTitle={step.title} type={pair[0]}
