@@ -149,17 +149,24 @@ export default function DemoPage() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <ModeSwitcher viewMode={viewMode} onChange={setViewMode} />
+      {/* ── Sticky: モード切替 + パネルヘッダー ── */}
+      <div className="sticky top-0 z-20 bg-gray-50 pb-4 pt-4 border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ModeSwitcher viewMode={viewMode} onChange={setViewMode} />
+        </div>
+        {isPair && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PanelHeader type={pair[0]} />
+              <PanelHeader type={pair[1]} />
+            </div>
+          </div>
+        )}
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         {isPair ? (
           <div className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <PanelHeader type={pair[0]} />
-              <PanelHeader type={pair[1]} />
-            </div>
             {visibleSteps.map((step) => (
               <div key={step.num} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
                 <StepWrapper stepNum={step.num} stepTitle={step.title} type={pair[0]}
