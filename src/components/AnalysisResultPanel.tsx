@@ -41,7 +41,10 @@ export default function AnalysisResultPanel({ type }: AnalysisResultPanelProps) 
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <p className="text-xs text-gray-500 leading-relaxed">
+        以下は、数千件規模のデータを想定した場合の分析イメージです。加工方式によって分析の粒度がどう変わるかをご確認ください。
+      </p>
+      <div className="grid grid-cols-1 gap-4">
         {analysis.map((item, i) => (
           <div key={i} className="border rounded-lg p-3">
             <h5 className="text-xs font-semibold text-gray-700">{item.title}</h5>
@@ -50,7 +53,7 @@ export default function AnalysisResultPanel({ type }: AnalysisResultPanelProps) 
                 {item.subtitle}
               </p>
             )}
-            <ResponsiveContainer width="100%" height={180}>
+            <ResponsiveContainer width="100%" height={200}>
               <BarChart data={item.data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis

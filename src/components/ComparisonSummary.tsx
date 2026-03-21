@@ -13,7 +13,7 @@ const PANEL_META: Record<PanelType, {
     badges: ['社外提供想定', '統計・分析向け', '個人復元前提なし'],
   },
   pseudonymized: {
-    label: '仮名加工情報', headerBg: 'bg-amber-500',
+    label: '仮名加工情報', headerBg: 'bg-amber-600',
     positiveBg: 'bg-amber-50 text-amber-800 font-semibold',
     badgeBg: 'bg-amber-100 text-amber-700',
     badges: ['社内利用限定', '継続分析向け', '管理措置前提'],
@@ -62,9 +62,12 @@ export default function ComparisonSummary({ left, right }: ComparisonSummaryProp
 
   return (
     <section className="bg-white shadow-sm rounded-lg p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">
+      <h2 className="text-xl font-bold text-gray-800 mb-2">
         {lMeta.label}と{rMeta.label}の比較
       </h2>
+      <p className="text-sm text-gray-600 mb-4">
+        ここまでの内容を踏まえた、2方式の特徴比較です。
+      </p>
 
       <div className="overflow-x-auto">
         <table className="w-full border rounded-lg overflow-hidden text-sm table-fixed">
@@ -128,24 +131,6 @@ export default function ComparisonSummary({ left, right }: ComparisonSummaryProp
         <span>△ 制約・留意点</span>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm font-semibold text-gray-600 mr-1">{lMeta.label}:</span>
-          {lMeta.badges.map((label) => (
-            <span key={label} className={`rounded-full ${lMeta.badgeBg} px-3 py-1 text-sm font-medium`}>
-              {label}
-            </span>
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-sm font-semibold text-gray-600 mr-1">{rMeta.label}:</span>
-          {rMeta.badges.map((label) => (
-            <span key={label} className={`rounded-full ${rMeta.badgeBg} px-3 py-1 text-sm font-medium`}>
-              {label}
-            </span>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }

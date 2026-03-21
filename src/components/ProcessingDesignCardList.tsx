@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { anonymizedDesigns, pseudonymizedDesigns, syntheticDesigns } from '../data';
 import type { PanelType } from '../types';
 
@@ -35,6 +36,7 @@ const designsMap = {
 export default function ProcessingDesignCardList({ type }: ProcessingDesignCardListProps) {
   const theme = themeMap[type];
   const designs = designsMap[type];
+  const [expandedLegal, setExpandedLegal] = useState<Record<number, boolean>>({});
 
   return (
     <div>
@@ -46,12 +48,31 @@ export default function ProcessingDesignCardList({ type }: ProcessingDesignCardL
             <div className={`px-4 py-2 ${theme.cardHeaderBg}`}>
               <div className="font-semibold text-sm">{design.category}</div>
               {design.legalBasis.length > 0 && (
-                <div className="mt-1 space-y-0.5">
-                  {design.legalBasis.map((basis, k) => (
-                    <div key={k} className="text-[11px] opacity-80">
-                      {basis}
+                <div className="mt-1">
+                  {expandedLegal[i] ? (
+                    <div className="space-y-0.5">
+                      {design.legalBasis.map((basis, k) => (
+                        <div key={k} className="text-[11px] opacity-80">
+                          {basis}
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        className="text-xs underline text-gray-400 cursor-pointer mt-0.5"
+                        onClick={() => setExpandedLegal((prev) => ({ ...prev, [i]: false }))}
+                      >
+                        法的根拠を閉じる
+                      </button>
                     </div>
-                  ))}
+                  ) : (
+                    <button
+                      type="button"
+                      className="text-xs underline text-gray-400 cursor-pointer"
+                      onClick={() => setExpandedLegal((prev) => ({ ...prev, [i]: true }))}
+                    >
+                      法的根拠を表示
+                    </button>
+                  )}
                 </div>
               )}
             </div>

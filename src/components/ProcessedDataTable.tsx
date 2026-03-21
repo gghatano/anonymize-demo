@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { sourceData, anonymizedData, pseudonymizedData, syntheticData } from '../data';
 import type { PersonRecord, PanelType } from '../types';
 
@@ -19,6 +20,10 @@ const HEADERS = [
 ] as const;
 
 type FieldKey = (typeof HEADERS)[number]['key'];
+
+const PRIMARY_KEYS: ReadonlyArray<FieldKey> = [
+  'customerId', 'name', 'age', 'gender', 'address', 'purchaseAmount', 'diseaseCategory',
+];
 
 function getBadge(
   originalValue: string,
@@ -89,10 +94,17 @@ export default function ProcessedDataTable({
   const theme = themeMap[type];
   const processedData = dataMap[type];
 
-  const buttonLabel = isSynthetic ? 'データ生成' : '加工実施';
+  const [showOriginal, setShowOriginal] = useState(false);
+  const [showAllColumns, setShowAllColumns] = useState(false);
+
+  const buttonLabel = isSynthetic ? '生成結果を表示' : '加工結果を表示';
   const descriptionText = isSynthetic
     ? '統計モデルに基づいて架空のデータを生成します'
-    : '加工設計に基づいてデータを加工します';
+    : '下のボタンを押すと、ステップ2の加工設計に基づいた加工結果のサンプルが表示されます（実際のデータ加工は行いません）';
+
+  const visibleHeaders = showAllColumns
+    ? HEADERS
+    : HEADERS.filter((h) => PRIMARY_KEYS.includes(h.key));
 
   if (processingState === 'before') {
     return (
@@ -113,46 +125,68 @@ export default function ProcessedDataTable({
       {/* 合成データの場合、加工前データは表示しない */}
       {!isSynthetic && (
         <div>
-          <h5 className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">
-            加工前データ
-          </h5>
-          <div className="overflow-x-auto border rounded-lg">
-            <table className="min-w-full text-xs">
-              <thead>
-                <tr className="bg-gray-100 text-gray-700">
-                  {HEADERS.map((h) => (
-                    <th
-                      key={h.key}
-                      className="px-3 py-2 text-left font-semibold whitespace-nowrap border-b border-r last:border-r-0"
-                    >
-                      {h.label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sourceData.map((row, i) => (
-                  <tr key={i} className="even:bg-gray-50/50">
-                    {HEADERS.map((h) => (
-                      <td
-                        key={h.key}
-                        className="px-3 py-1.5 whitespace-nowrap border-b border-r last:border-r-0"
-                      >
-                        {String(row[h.key])}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex items-center gap-2 mb-1">
+            <button
+              type="button"
+              onClick={() => setShowOriginal((prev) => !prev)}
+              className="text-xs text-gray-500 underline cursor-pointer"
+            >
+              {showOriginal ? '加工前データを非表示' : '加工前データを表示'}
+            </button>
           </div>
+          {showOriginal && (
+            <div>
+              <h5 className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">
+                加工前データ
+              </h5>
+              <div className="overflow-x-auto border rounded-lg">
+                <table className="min-w-full text-xs">
+                  <thead>
+                    <tr className="bg-gray-100 text-gray-700">
+                      {visibleHeaders.map((h) => (
+                        <th
+                          key={h.key}
+                          className="px-3 py-2 text-left font-semibold whitespace-nowrap border-b border-r last:border-r-0"
+                        >
+                          {h.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sourceData.map((row, i) => (
+                      <tr key={i} className="even:bg-gray-50/50">
+                        {visibleHeaders.map((h) => (
+                          <td
+                            key={h.key}
+                            className="px-3 py-1.5 whitespace-nowrap border-b border-r last:border-r-0"
+                          >
+                            {String(row[h.key])}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
       <div>
-        <h5 className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">
-          {isSynthetic ? '生成結果データ' : '加工後データ'}
-        </h5>
+        <div className="flex items-center justify-between mb-1">
+          <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {isSynthetic ? '生成結果データ' : '加工後データ'}
+          </h5>
+          <button
+            type="button"
+            onClick={() => setShowAllColumns((prev) => !prev)}
+            className="text-xs text-gray-500 underline cursor-pointer"
+          >
+            {showAllColumns ? '主要列のみ表示' : 'すべての列を表示'}
+          </button>
+        </div>
         {isSynthetic && (
           <p className="text-xs text-emerald-600 mb-2">
             ※ 以下は元データから生成された架空のレコードです
@@ -162,7 +196,7 @@ export default function ProcessedDataTable({
           <table className="min-w-full text-xs">
             <thead>
               <tr className={theme.headerBg}>
-                {HEADERS.map((h) => (
+                {visibleHeaders.map((h) => (
                   <th
                     key={h.key}
                     className="px-3 py-2 text-left font-semibold whitespace-nowrap border-b border-r last:border-r-0"
@@ -177,7 +211,7 @@ export default function ProcessedDataTable({
                 const original = isSynthetic ? null : (sourceData[i] as PersonRecord);
                 return (
                   <tr key={i} className="even:bg-gray-50/30">
-                    {HEADERS.map((h) => {
+                    {visibleHeaders.map((h) => {
                       const origVal = original ? String(original[h.key]) : '';
                       const procVal = String(row[h.key]);
                       const badge = getBadge(origVal, procVal, h.key, isSynthetic);

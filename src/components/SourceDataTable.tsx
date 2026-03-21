@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { sourceData } from '../data';
 import type { PanelType } from '../types';
 
@@ -17,6 +18,10 @@ const HEADERS = [
   { key: 'diseaseCategory', label: '疾患区分' },
   { key: 'contractType', label: '契約種別' },
 ] as const;
+
+const PRIMARY_KEYS: ReadonlyArray<(typeof HEADERS)[number]['key']> = [
+  'customerId', 'name', 'age', 'gender', 'address', 'purchaseAmount', 'diseaseCategory',
+];
 
 const anonymizedTargetFields = [
   '顧客ID', '氏名', '生年月日', '年齢', '郵便番号', '住所',
@@ -58,6 +63,11 @@ interface SourceDataTableProps {
 
 export default function SourceDataTable({ type }: SourceDataTableProps) {
   const theme = themeMap[type];
+  const [showAllColumns, setShowAllColumns] = useState(false);
+
+  const visibleHeaders = showAllColumns
+    ? HEADERS
+    : HEADERS.filter((h) => PRIMARY_KEYS.includes(h.key));
 
   return (
     <div>
@@ -75,11 +85,21 @@ export default function SourceDataTable({ type }: SourceDataTableProps) {
         </div>
       </div>
 
+      <div className="mb-1 text-right">
+        <button
+          type="button"
+          onClick={() => setShowAllColumns((prev) => !prev)}
+          className="text-xs text-gray-500 underline cursor-pointer"
+        >
+          {showAllColumns ? '主要列のみ表示' : 'すべての列を表示'}
+        </button>
+      </div>
+
       <div className="overflow-x-auto border rounded-lg">
         <table className="min-w-full text-xs">
           <thead>
             <tr className={theme.headerBg}>
-              {HEADERS.map((h) => (
+              {visibleHeaders.map((h) => (
                 <th
                   key={h.key}
                   className="px-3 py-2 text-left font-semibold whitespace-nowrap border-b border-r last:border-r-0"
@@ -92,7 +112,7 @@ export default function SourceDataTable({ type }: SourceDataTableProps) {
           <tbody>
             {sourceData.map((row, i) => (
               <tr key={i} className="hover:bg-gray-50 even:bg-gray-50/50">
-                {HEADERS.map((h) => (
+                {visibleHeaders.map((h) => (
                   <td
                     key={h.key}
                     className="px-3 py-1.5 whitespace-nowrap border-b border-r last:border-r-0"
