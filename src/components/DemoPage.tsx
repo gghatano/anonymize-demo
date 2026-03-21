@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ViewMode, ProcessingState, PanelType } from '../types';
+import { usePresentation } from '../contexts/PresentationContext';
 import ModeSwitcher from './ModeSwitcher';
 import ProcessPanel from './ProcessPanel';
 import StepContent from './StepContent';
@@ -45,13 +46,14 @@ const PAIR_MAP: Partial<Record<ViewMode, [PanelType, PanelType]>> = {
 };
 
 function PanelHeader({ type }: { type: PanelType }) {
+  const { isPresentation } = usePresentation();
   const t = THEME[type];
   return (
     <div className={`rounded-xl border-2 ${t.border} bg-white shadow-sm px-6 py-4`}>
-      <h2 className={`text-lg font-bold ${t.title}`}>{t.label}</h2>
+      <h2 className={`${isPresentation ? 'text-2xl' : 'text-lg'} font-bold ${t.title}`}>{t.label}</h2>
       <div className="flex flex-wrap gap-1.5 mt-2">
         {t.badges.map((b) => (
-          <span key={b} className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${t.badgeColor}`}>{b}</span>
+          <span key={b} className={`${isPresentation ? 'text-sm' : 'text-xs'} px-2.5 py-0.5 rounded-full font-medium ${t.badgeColor}`}>{b}</span>
         ))}
       </div>
     </div>
@@ -64,14 +66,15 @@ function StepWrapper({
   stepNum: number; stepTitle: string; type: PanelType;
   processingState: ProcessingState; onProcess: () => void;
 }) {
+  const { isPresentation } = usePresentation();
   const t = THEME[type];
   return (
-    <div className={`rounded-xl border-2 ${t.border} bg-white shadow-sm p-6`}>
+    <div className={`rounded-xl border-2 ${t.border} bg-white shadow-sm ${isPresentation ? 'p-8' : 'p-6'}`}>
       <div className="flex items-center gap-2 mb-3">
-        <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white ${t.badgeBg}`}>
+        <span className={`inline-flex items-center justify-center ${isPresentation ? 'w-10 h-10 text-base' : 'w-8 h-8 text-sm'} rounded-full font-bold text-white ${t.badgeBg}`}>
           {stepNum}
         </span>
-        <h3 className="text-base font-semibold text-gray-800">{stepTitle}</h3>
+        <h3 className={`${isPresentation ? 'text-lg' : 'text-base'} font-semibold text-gray-800`}>{stepTitle}</h3>
       </div>
       {stepNum === 5
         ? <UsageRuleCard type={type} />
@@ -82,6 +85,7 @@ function StepWrapper({
 }
 
 export default function DemoPage() {
+  const { isPresentation, setIsPresentation } = usePresentation();
   const [viewMode, setViewMode] = useState<ViewMode>('anon-pseudo');
   const [anonymizedState, setAnonymizedState] = useState<ProcessingState>('before');
   const [pseudonymizedState, setPseudonymizedState] = useState<ProcessingState>('before');
@@ -99,32 +103,54 @@ export default function DemoPage() {
       : () => setSyntheticState('after');
   }
 
+  // プレゼンモード時はステップ2（加工設計）をスキップ
+  const visibleSteps = isPresentation
+    ? STEPS.filter((s) => s.num !== 2)
+    : STEPS;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            匿名加工情報・仮名加工情報・合成データの比較デモ
-          </h1>
-          <p className="mt-1 text-base text-gray-600">
-            同一の元データに対して、3つの方式で何が異なるかを比較するデモ
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">
+              匿名加工情報・仮名加工情報・合成データの比較デモ
+            </h1>
+            <p className="mt-1 text-base text-gray-600">
+              同一の元データに対して、3つの方式で何が異なるかを比較するデモ
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-sm text-gray-500">プレゼン</span>
+            <button
+              onClick={() => setIsPresentation(!isPresentation)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                isPresentation ? 'bg-indigo-600' : 'bg-gray-300'
+              }`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                isPresentation ? 'translate-x-6' : 'translate-x-1'
+              }`} />
+            </button>
+          </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <div className="rounded-lg bg-yellow-50 border border-yellow-200 px-4 py-3 text-sm text-yellow-800">
+        <div className={`rounded-lg bg-yellow-50 border border-yellow-200 px-4 ${isPresentation ? 'py-2 text-xs' : 'py-3 text-sm'} text-yellow-800`}>
           本画面は比較理解のためのデモです。実際の加工処理・法令適合性判定を行うものではありません。
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-gray-600">
-          <span className="font-semibold">使い方：</span>
-          比較モードを選択し、ステップ1〜5を順に確認することで、各方式の違いが理解できます。
-          ステップ3では「加工結果を表示」ボタンを押すと、加工後のデータが表示されます。
+      {!isPresentation && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+          <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-gray-600">
+            <span className="font-semibold">使い方：</span>
+            比較モードを選択し、ステップ1〜5を順に確認することで、各方式の違いが理解できます。
+            ステップ3では「加工結果を表示」ボタンを押すと、加工後のデータが表示されます。
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <ModeSwitcher viewMode={viewMode} onChange={setViewMode} />
@@ -137,7 +163,7 @@ export default function DemoPage() {
               <PanelHeader type={pair[0]} />
               <PanelHeader type={pair[1]} />
             </div>
-            {STEPS.map((step) => (
+            {visibleSteps.map((step) => (
               <div key={step.num} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
                 <StepWrapper stepNum={step.num} stepTitle={step.title} type={pair[0]}
                   processingState={getState(pair[0])} onProcess={getOnProcess(pair[0])} />
@@ -164,11 +190,13 @@ export default function DemoPage() {
         />
       </section>
 
-      <footer className="border-t border-gray-200 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-xs text-gray-400">
-          本デモは教育・比較理解を目的としたものです。実際の法令適合性判定を行うものではありません。
-        </div>
-      </footer>
+      {!isPresentation && (
+        <footer className="border-t border-gray-200 mt-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-xs text-gray-400">
+            本デモは教育・比較理解を目的としたものです。実際の法令適合性判定を行うものではありません。
+          </div>
+        </footer>
+      )}
     </div>
   );
 }

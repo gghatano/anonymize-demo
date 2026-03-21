@@ -1,5 +1,6 @@
 import { anonymizedUsageRules, pseudonymizedUsageRules, syntheticUsageRules } from '../data';
 import type { PanelType } from '../types';
+import { usePresentation } from '../contexts/PresentationContext';
 
 interface UsageRuleCardProps {
   type: PanelType;
@@ -27,8 +28,15 @@ const rulesMap = {
 };
 
 export default function UsageRuleCard({ type }: UsageRuleCardProps) {
+  const { isPresentation } = usePresentation();
   const theme = themeMap[type];
   const rules = rulesMap[type];
+
+  const canDo = isPresentation ? rules.canDo.slice(0, 2) : rules.canDo;
+  const constraints = isPresentation ? rules.constraints.slice(0, 2) : rules.constraints;
+  const highlights = isPresentation ? rules.highlights.slice(0, 1) : rules.highlights;
+
+  const textSize = isPresentation ? 'text-sm' : 'text-xs';
 
   return (
     <div className={`border rounded-lg p-4 ${theme.accentBorder}`}>
@@ -37,10 +45,10 @@ export default function UsageRuleCard({ type }: UsageRuleCardProps) {
       <div className="space-y-3">
         {/* できること */}
         <div>
-          <h5 className="text-xs font-semibold text-green-700 mb-1.5">できること</h5>
+          <h5 className={`${textSize} font-semibold text-green-700 mb-1.5`}>できること</h5>
           <ul className="space-y-1">
-            {rules.canDo.map((item, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
+            {canDo.map((item, i) => (
+              <li key={i} className={`flex items-start gap-1.5 ${textSize} text-gray-700`}>
                 <span className="text-green-500 mt-0.5 shrink-0">✓</span>
                 <span>{item}</span>
               </li>
@@ -50,10 +58,10 @@ export default function UsageRuleCard({ type }: UsageRuleCardProps) {
 
         {/* 制約・留意 */}
         <div>
-          <h5 className="text-xs font-semibold text-amber-700 mb-1.5">制約・留意</h5>
+          <h5 className={`${textSize} font-semibold text-amber-700 mb-1.5`}>制約・留意</h5>
           <ul className="space-y-1">
-            {rules.constraints.map((item, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-xs text-gray-700">
+            {constraints.map((item, i) => (
+              <li key={i} className={`flex items-start gap-1.5 ${textSize} text-gray-700`}>
                 <span className="text-amber-500 mt-0.5 shrink-0">⚠</span>
                 <span>{item}</span>
               </li>
@@ -63,10 +71,10 @@ export default function UsageRuleCard({ type }: UsageRuleCardProps) {
 
         {/* 強調文言 */}
         <div className="space-y-1.5">
-          {rules.highlights.map((item, i) => (
+          {highlights.map((item, i) => (
             <div
               key={i}
-              className={`text-xs px-3 py-2 rounded border font-medium ${theme.highlightBg}`}
+              className={`${textSize} px-3 py-2 rounded border font-medium ${theme.highlightBg}`}
             >
               {item}
             </div>

@@ -1,4 +1,5 @@
 import type { ProcessingState, PanelType } from '../types';
+import { usePresentation } from '../contexts/PresentationContext';
 import SourceDataTable from './SourceDataTable';
 import ProcessingDesignCardList from './ProcessingDesignCardList';
 import ProcessedDataTable from './ProcessedDataTable';
@@ -41,6 +42,7 @@ const THEME: Record<PanelType, {
 };
 
 export default function ProcessPanel({ type, processingState, onProcess }: ProcessPanelProps) {
+  const { isPresentation } = usePresentation();
   const t = THEME[type];
   const panelBorder = t.border;
   const titleColor = t.title;
@@ -49,16 +51,21 @@ export default function ProcessPanel({ type, processingState, onProcess }: Proce
   const badges = t.badges;
   const badgeColor = t.badgeColor;
 
+  // プレゼンモード時はステップ2（加工設計）をスキップ
+  const visibleSteps = isPresentation
+    ? STEPS.filter((s) => s.num !== 2)
+    : STEPS;
+
   return (
     <div className={`rounded-xl border-2 ${panelBorder} bg-white shadow-sm`}>
       {/* Panel header */}
       <div className="px-6 py-4 border-b border-gray-100">
-        <h2 className={`text-lg font-bold ${titleColor}`}>{panelLabel}</h2>
+        <h2 className={`${isPresentation ? 'text-xl' : 'text-lg'} font-bold ${titleColor}`}>{panelLabel}</h2>
         <div className="flex flex-wrap gap-1.5 mt-2">
           {badges.map((b) => (
             <span
               key={b}
-              className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${badgeColor}`}
+              className={`${isPresentation ? 'text-sm' : 'text-xs'} px-2.5 py-0.5 rounded-full font-medium ${badgeColor}`}
             >
               {b}
             </span>
@@ -68,7 +75,7 @@ export default function ProcessPanel({ type, processingState, onProcess }: Proce
 
       {/* Steps */}
       <div className="p-6 space-y-8">
-        {STEPS.map((step) => (
+        {visibleSteps.map((step) => (
           <section key={step.num}>
             <div className="flex items-center gap-2 mb-3">
               <span

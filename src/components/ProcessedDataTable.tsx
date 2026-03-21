@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { sourceData, anonymizedData, pseudonymizedData, syntheticData } from '../data';
 import type { PersonRecord, PanelType } from '../types';
+import { usePresentation } from '../contexts/PresentationContext';
 
 const HEADERS = [
   { key: 'customerId', label: '顧客ID' },
@@ -23,6 +24,10 @@ type FieldKey = (typeof HEADERS)[number]['key'];
 
 const PRIMARY_KEYS: ReadonlyArray<FieldKey> = [
   'customerId', 'name', 'age', 'gender', 'address', 'purchaseAmount', 'diseaseCategory',
+];
+
+const PRESENTATION_KEYS: ReadonlyArray<FieldKey> = [
+  'customerId', 'name', 'age', 'purchaseAmount',
 ];
 
 function getBadge(
@@ -90,6 +95,7 @@ export default function ProcessedDataTable({
   processingState,
   onProcess,
 }: ProcessedDataTableProps) {
+  const { isPresentation } = usePresentation();
   const isSynthetic = type === 'synthetic';
   const theme = themeMap[type];
   const processedData = dataMap[type];
@@ -102,9 +108,18 @@ export default function ProcessedDataTable({
     ? '統計モデルに基づいて架空のデータを生成します'
     : '下のボタンを押すと、ステップ2の加工設計に基づいた加工結果のサンプルが表示されます（実際のデータ加工は行いません）';
 
-  const visibleHeaders = showAllColumns
-    ? HEADERS
-    : HEADERS.filter((h) => PRIMARY_KEYS.includes(h.key));
+  const visibleHeaders = isPresentation
+    ? HEADERS.filter((h) => PRESENTATION_KEYS.includes(h.key))
+    : showAllColumns
+      ? HEADERS
+      : HEADERS.filter((h) => PRIMARY_KEYS.includes(h.key));
+
+  const visibleProcessedData = isPresentation ? processedData.slice(0, 3) : processedData;
+  const visibleSourceData = isPresentation ? sourceData.slice(0, 3) : sourceData;
+
+  const cellPx = isPresentation ? 'px-4' : 'px-3';
+  const cellPy = isPresentation ? 'py-2.5' : 'py-1.5';
+  const textSize = isPresentation ? 'text-sm' : 'text-xs';
 
   if (processingState === 'before') {
     return (
@@ -112,7 +127,7 @@ export default function ProcessedDataTable({
         <p className="text-sm text-gray-500">{descriptionText}</p>
         <button
           onClick={onProcess}
-          className={`px-6 py-2.5 rounded-lg text-white font-medium shadow-sm transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme.btnColor}`}
+          className={`${isPresentation ? 'px-8 py-3 text-lg' : 'px-6 py-2.5'} rounded-lg text-white font-medium shadow-sm transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme.btnColor}`}
         >
           {buttonLabel}
         </button>
@@ -123,7 +138,7 @@ export default function ProcessedDataTable({
   return (
     <div className="space-y-4">
       {/* 合成データの場合、加工前データは表示しない */}
-      {!isSynthetic && (
+      {!isSynthetic && !isPresentation && (
         <div>
           <div className="flex items-center gap-2 mb-1">
             <button
@@ -154,7 +169,7 @@ export default function ProcessedDataTable({
                     </tr>
                   </thead>
                   <tbody>
-                    {sourceData.map((row, i) => (
+                    {visibleSourceData.map((row, i) => (
                       <tr key={i} className="even:bg-gray-50/50">
                         {visibleHeaders.map((h) => (
                           <td
@@ -179,13 +194,15 @@ export default function ProcessedDataTable({
           <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
             {isSynthetic ? '生成結果データ' : '加工後データ'}
           </h5>
-          <button
-            type="button"
-            onClick={() => setShowAllColumns((prev) => !prev)}
-            className="text-xs text-gray-500 underline cursor-pointer"
-          >
-            {showAllColumns ? '主要列のみ表示' : 'すべての列を表示'}
-          </button>
+          {!isPresentation && (
+            <button
+              type="button"
+              onClick={() => setShowAllColumns((prev) => !prev)}
+              className="text-xs text-gray-500 underline cursor-pointer"
+            >
+              {showAllColumns ? '主要列のみ表示' : 'すべての列を表示'}
+            </button>
+          )}
         </div>
         {isSynthetic && (
           <p className="text-xs text-emerald-600 mb-2">
@@ -193,13 +210,13 @@ export default function ProcessedDataTable({
           </p>
         )}
         <div className="overflow-x-auto border rounded-lg">
-          <table className="min-w-full text-xs">
+          <table className={`min-w-full ${textSize}`}>
             <thead>
               <tr className={theme.headerBg}>
                 {visibleHeaders.map((h) => (
                   <th
                     key={h.key}
-                    className="px-3 py-2 text-left font-semibold whitespace-nowrap border-b border-r last:border-r-0"
+                    className={`${cellPx} py-2 text-left font-semibold whitespace-nowrap border-b border-r last:border-r-0`}
                   >
                     {h.label}
                   </th>
@@ -207,8 +224,8 @@ export default function ProcessedDataTable({
               </tr>
             </thead>
             <tbody>
-              {processedData.map((row, i) => {
-                const original = isSynthetic ? null : (sourceData[i] as PersonRecord);
+              {visibleProcessedData.map((row, i) => {
+                const original = isSynthetic ? null : (visibleSourceData[i] as PersonRecord | undefined);
                 return (
                   <tr key={i} className="even:bg-gray-50/30">
                     {visibleHeaders.map((h) => {
@@ -220,7 +237,7 @@ export default function ProcessedDataTable({
                       return (
                         <td
                           key={h.key}
-                          className={`px-3 py-1.5 whitespace-nowrap border-b border-r last:border-r-0 ${
+                          className={`${cellPx} ${cellPy} whitespace-nowrap border-b border-r last:border-r-0 ${
                             isChanged ? theme.changedCellBg : ''
                           }`}
                         >
