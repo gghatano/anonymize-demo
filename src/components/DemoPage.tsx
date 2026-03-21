@@ -103,10 +103,7 @@ export default function DemoPage() {
       : () => setSyntheticState('after');
   }
 
-  // プレゼンモード時はステップ2（加工設計）をスキップ
-  const visibleSteps = isPresentation
-    ? STEPS.filter((s) => s.num !== 2)
-    : STEPS;
+  const visibleSteps = STEPS;
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -51,10 +51,7 @@ export default function ProcessPanel({ type, processingState, onProcess }: Proce
   const badges = t.badges;
   const badgeColor = t.badgeColor;
 
-  // プレゼンモード時はステップ2（加工設計）をスキップ
-  const visibleSteps = isPresentation
-    ? STEPS.filter((s) => s.num !== 2)
-    : STEPS;
+  const visibleSteps = STEPS;
 
   return (
     <div className={`rounded-xl border-2 ${panelBorder} bg-white shadow-sm`}>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { anonymizedDesigns, pseudonymizedDesigns, syntheticDesigns } from '../data';
 import type { PanelType } from '../types';
+import { usePresentation } from '../contexts/PresentationContext';
 
 interface ProcessingDesignCardListProps {
   type: PanelType;
@@ -34,9 +35,13 @@ const designsMap = {
 };
 
 export default function ProcessingDesignCardList({ type }: ProcessingDesignCardListProps) {
+  const { isPresentation } = usePresentation();
   const theme = themeMap[type];
   const designs = designsMap[type];
   const [expandedLegal, setExpandedLegal] = useState<Record<number, boolean>>({});
+
+  const textSize = isPresentation ? 'text-sm' : 'text-xs';
+  const cellPad = isPresentation ? 'px-4 py-2.5' : 'px-3 py-1.5';
 
   return (
     <div>
@@ -47,7 +52,7 @@ export default function ProcessingDesignCardList({ type }: ProcessingDesignCardL
           <div key={i} className={`border rounded-lg shadow-sm overflow-hidden ${theme.cardBorder}`}>
             <div className={`px-4 py-2 ${theme.cardHeaderBg}`}>
               <div className="font-semibold text-sm">{design.category}</div>
-              {design.legalBasis.length > 0 && (
+              {!isPresentation && design.legalBasis.length > 0 && (
                 <div className="mt-1">
                   {expandedLegal[i] ? (
                     <div className="space-y-0.5">
@@ -77,20 +82,20 @@ export default function ProcessingDesignCardList({ type }: ProcessingDesignCardL
               )}
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+              <table className={`w-full ${textSize}`}>
                 <thead>
                   <tr className={theme.tableHeaderBg}>
-                    <th className="px-3 py-1.5 text-left font-medium border-b w-1/5">項目</th>
-                    <th className="px-3 py-1.5 text-left font-medium border-b w-2/5">加工内容</th>
-                    <th className="px-3 py-1.5 text-left font-medium border-b w-2/5">意図</th>
+                    <th className={`${cellPad} text-left font-medium border-b w-1/5`}>項目</th>
+                    <th className={`${cellPad} text-left font-medium border-b w-2/5`}>加工内容</th>
+                    <th className={`${cellPad} text-left font-medium border-b w-2/5`}>意図</th>
                   </tr>
                 </thead>
                 <tbody>
                   {design.items.map((item, j) => (
                     <tr key={j} className="hover:bg-gray-50">
-                      <td className="px-3 py-1.5 border-b font-medium">{item.field}</td>
-                      <td className="px-3 py-1.5 border-b">{item.method}</td>
-                      <td className="px-3 py-1.5 border-b text-gray-600">{item.intent}</td>
+                      <td className={`${cellPad} border-b font-medium`}>{item.field}</td>
+                      <td className={`${cellPad} border-b`}>{item.method}</td>
+                      <td className={`${cellPad} border-b text-gray-600`}>{item.intent}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -100,9 +105,11 @@ export default function ProcessingDesignCardList({ type }: ProcessingDesignCardL
         ))}
       </div>
 
-      <p className="mt-3 text-xs text-gray-500 leading-relaxed">
-        ※ 法令の厳密な要件判定を行うものではなく、比較理解のための画面デモです
-      </p>
+      {!isPresentation && (
+        <p className="mt-3 text-xs text-gray-500 leading-relaxed">
+          ※ 法令の厳密な要件判定を行うものではなく、比較理解のための画面デモです
+        </p>
+      )}
     </div>
   );
 }
