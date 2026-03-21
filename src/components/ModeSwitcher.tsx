@@ -1,4 +1,5 @@
 import type { ViewMode } from '../types';
+import { usePresentation } from '../contexts/PresentationContext';
 
 interface ModeSwitcherProps {
   viewMode: ViewMode;
@@ -18,6 +19,12 @@ const singleModes: { value: ViewMode; label: string }[] = [
 ];
 
 export default function ModeSwitcher({ viewMode, onChange }: ModeSwitcherProps) {
+  const { isPresentation } = usePresentation();
+
+  const btnPx = isPresentation ? 'px-5' : 'px-4';
+  const btnPy = isPresentation ? 'py-2.5' : 'py-2';
+  const btnText = isPresentation ? 'text-base' : 'text-sm';
+
   const renderButton = ({ value, label }: { value: ViewMode; label: string }) => {
     const isActive = viewMode === value;
     return (
@@ -25,7 +32,7 @@ export default function ModeSwitcher({ viewMode, onChange }: ModeSwitcherProps) 
         key={value}
         onClick={() => onChange(value)}
         className={`
-          px-4 py-2 rounded-lg text-sm font-medium transition-colors
+          ${btnPx} ${btnPy} rounded-lg ${btnText} font-medium transition-colors
           border cursor-pointer
           ${
             isActive

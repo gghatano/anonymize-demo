@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { comparisonSummary } from '../data';
 import type { HighlightType, PanelType, ComparisonRow } from '../types';
+import { usePresentation } from '../contexts/PresentationContext';
 
 const PANEL_META: Record<PanelType, {
   label: string; headerBg: string;
@@ -57,20 +58,31 @@ interface ComparisonSummaryProps {
 }
 
 export default function ComparisonSummary({ left, right }: ComparisonSummaryProps) {
+  const { isPresentation } = usePresentation();
   const lMeta = PANEL_META[left];
   const rMeta = PANEL_META[right];
+
+  const textSize = isPresentation ? 'text-base' : 'text-sm';
+  const cellPx = isPresentation ? 'px-5' : 'px-4';
+
+  // プレゼンモード時は概要行（overview group）のみ表示
+  const visibleRows = isPresentation
+    ? comparisonSummary.filter((row) => row.group === 'overview')
+    : comparisonSummary;
 
   return (
     <section className="bg-white shadow-sm rounded-lg p-6">
       <h2 className="text-xl font-bold text-gray-800 mb-2">
         {lMeta.label}と{rMeta.label}の比較
       </h2>
-      <p className="text-sm text-gray-600 mb-4">
-        ここまでの内容を踏まえた、2方式の特徴比較です。
-      </p>
+      {!isPresentation && (
+        <p className="text-sm text-gray-600 mb-4">
+          ここまでの内容を踏まえた、2方式の特徴比較です。
+        </p>
+      )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full border rounded-lg overflow-hidden text-sm table-fixed">
+      <div className={`overflow-x-auto ${isPresentation ? 'mt-4' : ''}`}>
+        <table className={`w-full border rounded-lg overflow-hidden ${textSize} table-fixed`}>
           <colgroup>
             <col className="w-[20%]" />
             <col className="w-[40%]" />
@@ -78,20 +90,20 @@ export default function ComparisonSummary({ left, right }: ComparisonSummaryProp
           </colgroup>
           <thead>
             <tr>
-              <th className="bg-gray-100 text-gray-700 px-4 py-3 text-left font-semibold border-b">
+              <th className={`bg-gray-100 text-gray-700 ${cellPx} py-3 text-left font-semibold border-b`}>
                 比較項目
               </th>
-              <th className={`${lMeta.headerBg} text-white px-4 py-3 text-left font-semibold border-b`}>
+              <th className={`${lMeta.headerBg} text-white ${cellPx} py-3 text-left font-semibold border-b`}>
                 {lMeta.label}
               </th>
-              <th className={`${rMeta.headerBg} text-white px-4 py-3 text-left font-semibold border-b`}>
+              <th className={`${rMeta.headerBg} text-white ${cellPx} py-3 text-left font-semibold border-b`}>
                 {rMeta.label}
               </th>
             </tr>
           </thead>
           <tbody>
-            {comparisonSummary.map((row, idx) => {
-              const prevRow = idx > 0 ? comparisonSummary[idx - 1] : null;
+            {visibleRows.map((row, idx) => {
+              const prevRow = idx > 0 ? visibleRows[idx - 1] : null;
               const isGroupBoundary = prevRow && prevRow.group !== row.group;
               const isOverview = row.group === 'overview';
               const py = isOverview ? 'py-4' : 'py-3';
@@ -109,13 +121,13 @@ export default function ComparisonSummary({ left, right }: ComparisonSummaryProp
                     </tr>
                   )}
                   <tr>
-                    <td className={`px-4 border-b font-medium text-gray-700 ${py} text-sm`}>
+                    <td className={`${cellPx} border-b font-medium text-gray-700 ${py} ${textSize}`}>
                       {row.item}
                     </td>
-                    <td className={`px-4 border-b ${py} text-sm ${highlightClasses(lHighlight, left)}`}>
+                    <td className={`${cellPx} border-b ${py} ${textSize} ${highlightClasses(lHighlight, left)}`}>
                       {highlightIcon(lHighlight)}{lValue}
                     </td>
-                    <td className={`px-4 border-b ${py} text-sm ${highlightClasses(rHighlight, right)}`}>
+                    <td className={`${cellPx} border-b ${py} ${textSize} ${highlightClasses(rHighlight, right)}`}>
                       {highlightIcon(rHighlight)}{rValue}
                     </td>
                   </tr>

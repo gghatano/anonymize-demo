@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { sourceData } from '../data';
 import type { PanelType } from '../types';
+import { usePresentation } from '../contexts/PresentationContext';
 
 const HEADERS = [
   { key: 'customerId', label: '顧客ID' },
@@ -21,6 +22,10 @@ const HEADERS = [
 
 const PRIMARY_KEYS: ReadonlyArray<(typeof HEADERS)[number]['key']> = [
   'customerId', 'name', 'age', 'gender', 'address', 'purchaseAmount', 'diseaseCategory',
+];
+
+const PRESENTATION_KEYS: ReadonlyArray<(typeof HEADERS)[number]['key']> = [
+  'customerId', 'name', 'age', 'purchaseAmount',
 ];
 
 const anonymizedTargetFields = [
@@ -62,47 +67,56 @@ interface SourceDataTableProps {
 }
 
 export default function SourceDataTable({ type }: SourceDataTableProps) {
+  const { isPresentation } = usePresentation();
   const theme = themeMap[type];
   const [showAllColumns, setShowAllColumns] = useState(false);
 
-  const visibleHeaders = showAllColumns
-    ? HEADERS
-    : HEADERS.filter((h) => PRIMARY_KEYS.includes(h.key));
+  const visibleHeaders = isPresentation
+    ? HEADERS.filter((h) => PRESENTATION_KEYS.includes(h.key))
+    : showAllColumns
+      ? HEADERS
+      : HEADERS.filter((h) => PRIMARY_KEYS.includes(h.key));
+
+  const visibleData = isPresentation ? sourceData.slice(0, 3) : sourceData;
 
   return (
     <div>
-      <div className="mb-3">
-        <h4 className="text-sm font-semibold text-gray-700 mb-2">加工対象項目</h4>
-        <div className="flex flex-wrap gap-1.5">
-          {theme.targetFields.map((f) => (
-            <span
-              key={f}
-              className={`text-xs px-2 py-0.5 rounded-full border ${theme.tagColor}`}
-            >
-              {f}
-            </span>
-          ))}
+      {!isPresentation && (
+        <div className="mb-3">
+          <h4 className="text-sm font-semibold text-gray-700 mb-2">加工対象項目</h4>
+          <div className="flex flex-wrap gap-1.5">
+            {theme.targetFields.map((f) => (
+              <span
+                key={f}
+                className={`text-xs px-2 py-0.5 rounded-full border ${theme.tagColor}`}
+              >
+                {f}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="mb-1 text-right">
-        <button
-          type="button"
-          onClick={() => setShowAllColumns((prev) => !prev)}
-          className="text-xs text-gray-500 underline cursor-pointer"
-        >
-          {showAllColumns ? '主要列のみ表示' : 'すべての列を表示'}
-        </button>
-      </div>
+      {!isPresentation && (
+        <div className="mb-1 text-right">
+          <button
+            type="button"
+            onClick={() => setShowAllColumns((prev) => !prev)}
+            className="text-xs text-gray-500 underline cursor-pointer"
+          >
+            {showAllColumns ? '主要列のみ表示' : 'すべての列を表示'}
+          </button>
+        </div>
+      )}
 
       <div className="overflow-x-auto border rounded-lg">
-        <table className="min-w-full text-xs">
+        <table className={`min-w-full ${isPresentation ? 'text-sm' : 'text-xs'}`}>
           <thead>
             <tr className={theme.headerBg}>
               {visibleHeaders.map((h) => (
                 <th
                   key={h.key}
-                  className="px-3 py-2 text-left font-semibold whitespace-nowrap border-b border-r last:border-r-0"
+                  className={`${isPresentation ? 'px-4 py-2.5' : 'px-3 py-2'} text-left font-semibold whitespace-nowrap border-b border-r last:border-r-0`}
                 >
                   {h.label}
                 </th>
@@ -110,12 +124,12 @@ export default function SourceDataTable({ type }: SourceDataTableProps) {
             </tr>
           </thead>
           <tbody>
-            {sourceData.map((row, i) => (
+            {visibleData.map((row, i) => (
               <tr key={i} className="hover:bg-gray-50 even:bg-gray-50/50">
                 {visibleHeaders.map((h) => (
                   <td
                     key={h.key}
-                    className="px-3 py-1.5 whitespace-nowrap border-b border-r last:border-r-0"
+                    className={`${isPresentation ? 'px-4 py-2.5' : 'px-3 py-1.5'} whitespace-nowrap border-b border-r last:border-r-0`}
                   >
                     {String(row[h.key])}
                   </td>
@@ -126,9 +140,11 @@ export default function SourceDataTable({ type }: SourceDataTableProps) {
         </table>
       </div>
 
-      <p className="mt-3 text-xs text-gray-500 leading-relaxed">
-        {theme.note}
-      </p>
+      {!isPresentation && (
+        <p className="mt-3 text-xs text-gray-500 leading-relaxed">
+          {theme.note}
+        </p>
+      )}
     </div>
   );
 }
